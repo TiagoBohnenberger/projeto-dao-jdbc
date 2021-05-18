@@ -49,16 +49,8 @@ public class SellerDaoJDBC implements SellerDao {
             resultSet = preparedStatement.executeQuery();
 
             if(resultSet.next()) {
-                Department department = new Department();
-                department.setId(resultSet.getInt("DepartmentId"));
-                department.setName(resultSet.getString("DepName"));
-                Seller obj = new Seller();
-                obj.setId(resultSet.getInt("Id"));
-                obj.setName(resultSet.getString("Name"));
-                obj.setEmail(resultSet.getString("Email"));
-                obj.setBaseSalary(resultSet.getDouble("BaseSalary"));
-                obj.setBirthdate(resultSet.getDate("BirthDate"));
-                obj.setDepartment(department);
+                Department department = instantiateDepartment(resultSet);
+                Seller obj = instantiateSeller(resultSet, department);
                 return obj;
             }
             return null;
@@ -66,10 +58,29 @@ public class SellerDaoJDBC implements SellerDao {
         catch (SQLException e) {
             throw new DbException(e.getMessage());
         }
+
         finally {
             DB.closeStatement(preparedStatement);
             DB.closeResultSet(resultSet);
         }
+    }
+
+    private Department instantiateDepartment(ResultSet resultSet) throws SQLException {
+        Department department = new Department();
+        department.setId(resultSet.getInt("DepartmentId"));
+        department.setName(resultSet.getString("DepName"));
+        return department;
+    }
+
+    private Seller instantiateSeller(ResultSet resultSet, Department department) throws SQLException {
+        Seller obj = new Seller();
+        obj.setId(resultSet.getInt("Id"));
+        obj.setName(resultSet.getString("Name"));
+        obj.setEmail(resultSet.getString("Email"));
+        obj.setBaseSalary(resultSet.getDouble("BaseSalary"));
+        obj.setBirthdate(resultSet.getDate("BirthDate"));
+        obj.setDepartment(department);
+        return obj;
     }
 
     @Override
